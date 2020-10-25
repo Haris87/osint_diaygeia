@@ -8,8 +8,6 @@ if (process.argv.length === 2) {
 
 let query = process.argv[2]; // "ΜΠΟΥΧΛΗΣ ΧΑΡΑΛΑΜΠΟΣ"
 
-console.log(query);
-
 query = encodeURI(query);
 
 const url = `https://diavgeia.gov.gr/luminapi/api/search/export?q=q:\"${query}\"&sort=relative&wt=json`;
@@ -19,9 +17,16 @@ request(url, function (error, response, body) {
   if (!error && response.statusCode == 200) {
     const data = JSON.parse(body);
     fs.writeFile("./response.json", body, function () {});
-    // console.log("documents found:", data.info.total);
 
-    console.log(data);
+    const results = data.decisionResultList.map((r) => {
+      return {
+        subject: r.subject,
+        organisation: r.organizationLabel,
+        url: r.documentUrl,
+      };
+    });
+    console.log(results);
+    console.log(results.length);
   } else {
     console.log(error);
     console.log(response);
